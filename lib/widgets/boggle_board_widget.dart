@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LetterDiceWidget extends StatelessWidget {
+class BoggleBoardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     throw UnimplementedError();
