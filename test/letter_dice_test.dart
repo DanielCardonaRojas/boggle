@@ -8,4 +8,19 @@ void main() {
       () {
     expect(() => LetterDice("abcde"), throwsA(isA<DiceException>()));
   });
+
+  test('is not equal to copy with selected state toggled', () {
+    final dice1 = LetterDice("abcdef");
+    final dice2 = LetterDice("abcdef");
+    assert(dice1 == dice2);
+
+    dice2.toggleSelection();
+    assert(dice1 != dice2);
+  });
+
+  test('clone has difference hashCode', () {
+    final dice1 = LetterDice("abcdef");
+    final dice2 = dice1.clone();
+    assert(dice1.hashCode != dice2.hashCode);
+  });
 }

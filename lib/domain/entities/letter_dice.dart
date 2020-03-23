@@ -1,27 +1,16 @@
-import 'package:boggle/domain/entities/boggle_board.dart';
+import 'dart:math';
+
+import 'package:boggle/domain/entities/position.dart';
+import 'package:boggle/domain/entities/selectable.dart';
 import 'package:boggle/domain/errors.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
-mixin BoardPositioned {
-  int row;
-  int col;
-
-  bool get hasPosition {
-    return row != null && col != null;
-  }
-
-  void setPosition({@required int row, @required int column}) {
-    this.row = row;
-    this.col = column;
-  }
-}
-
-class LetterDice extends Equatable with BoardPositioned {
+class LetterDice extends Equatable with BoardPositioned, Selectable {
   final String letters;
+  int _selectedFaceIndex = 0;
 
   String get topLetter {
-    return letters[0];
+    return letters[_selectedFaceIndex];
   }
 
   LetterDice(this.letters) {
@@ -30,10 +19,20 @@ class LetterDice extends Equatable with BoardPositioned {
     }
   }
 
-  void roll() {}
+  void roll() {
+    _selectedFaceIndex = Random().nextInt(letters.length - 1);
+  }
+
+  LetterDice clone() {
+    final newDice = LetterDice(letters);
+    newDice.position = position;
+    newDice._selectedFaceIndex = _selectedFaceIndex;
+    newDice.selectedState.setSelected(isSelected);
+    return newDice;
+  }
 
   @override
-  List<Object> get props => [letters];
+  List<Object> get props => [letters, _selectedFaceIndex, isSelected, position];
 
   @override
   bool get stringify => true;

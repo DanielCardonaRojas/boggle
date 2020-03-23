@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:boggle/data/dice_reader.dart';
 import 'package:boggle/domain/entities/letter_dice.dart';
+import 'package:boggle/domain/entities/position.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
@@ -28,6 +29,14 @@ class BoggleBoard extends Equatable {
       final col = index % dimension;
       dice.setPosition(row: row, column: col);
     });
+  }
+
+  void toggleSelectionForDice(Position position) {
+    final index = position.row * dimension + position.col;
+    final selected = dice[index];
+    final newDice = selected.clone();
+    newDice.toggleSelection();
+    dice[index] = newDice;
   }
 
   void shuffle() {
