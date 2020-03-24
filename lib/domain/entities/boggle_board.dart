@@ -1,52 +1,66 @@
-import 'dart:math';
+library boggle_board;
 
+import 'dart:math';
 import 'package:boggle/data/dice_reader.dart';
-import 'package:boggle/domain/entities/letter_dice.dart';
 import 'package:boggle/domain/entities/position.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'boggle_dice.dart';
 
-class BoggleBoard extends Equatable {
-  final int dimension;
-  final List<LetterDice> dice;
+import 'dart:convert';
 
-  BoggleBoard({@required this.dice, this.dimension = 4});
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
+
+part 'boggle_board.g.dart';
+
+abstract class BoggleBoard implements Built<BoggleBoard, BoggleBoardBuilder> {
+  int get dimension;
+  BuiltList<BoggleDice> get dice;
+
+  BoggleBoard._();
+  factory BoggleBoard([updates(BoggleBoardBuilder b)]) = _$BoggleBoard;
 
   static Future<BoggleBoard> fromDiceFile(String fileName) async {
     final diceStrings = await diceReader(fileName);
     final dim = sqrt(diceStrings.length).toInt();
-    List<LetterDice> allDice =
-        diceStrings.map((letters) => LetterDice(letters)).toList();
+    List<BoggleDice> allDice =
+        diceStrings.map((letters) => BoggleDice.fromLetters(letters)).toList();
 
-    final board = BoggleBoard(dice: allDice, dimension: dim);
-    board.updatePositions();
-    return board;
+    final board = BoggleBoard((b) => b
+      ..dice.addAll(allDice)
+      ..dimension = dim);
+    return board.updatePositions();
   }
 
-  void updatePositions() {
-    dice.asMap().forEach((index, dice) {
+  BoggleBoard updatePositions() {
+    final List<BoggleDice> newDices = List();
+    dice.asMap().forEach((index, d) {
       final row = index ~/ dimension;
       final col = index % dimension;
-      dice.setPosition(row: row, column: col);
+      final newDice = d.setPosition(row: row, column: col);
+      newDices.add(newDice);
     });
+
+    return rebuild((b) => b..dice.setAll(0, newDices));
   }
 
-  void toggleSelectionForDice(Position position) {
+  BoggleBoard togglingSelectionForDice(Position position) {
     final index = position.row * dimension + position.col;
     final selected = dice[index];
-    final newDice = selected.clone();
-    newDice.toggleSelection();
-    dice[index] = newDice;
+    return rebuild(
+      (board) => board
+        ..dice.update(
+          (b) => b..[index] = selected.toggleSelected(),
+        ),
+    );
   }
 
-  void shuffle() {
-    dice.shuffle();
-    dice.forEach((die) {
-      die.roll();
-    });
-    updatePositions();
+  BoggleBoard shuffled() {
+    return rebuild((board) => board
+      ..dice.update((b) => b
+        ..shuffle()
+        ..map((dice) => dice.roll()))).updatePositions();
   }
-
-  @override
-  List<Object> get props => [dimension, dice];
 }

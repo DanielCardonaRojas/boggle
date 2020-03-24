@@ -1,10 +1,10 @@
-import 'package:boggle/domain/entities/letter_dice.dart';
+import 'package:boggle/domain/entities/boggle_dice.dart';
 import 'package:boggle/presentation/bloc/gameplay_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LetterDiceWidget extends StatelessWidget {
-  final LetterDice dice;
+  final BoggleDice dice;
 
   const LetterDiceWidget({Key key, this.dice}) : super(key: key);
 

@@ -22,7 +22,7 @@ class BoggleBoardWidget extends StatelessWidget {
     List<Row> rows = [];
 
     for (var k = 0; k < board.dimension; k++) {
-      final diceForRow = board.dice.where((dice) => dice.row == k);
+      final diceForRow = board.dice.where((dice) => dice.position.row == k);
       print(diceForRow);
 
       final diceWidgets =

@@ -22,14 +22,11 @@ class GameplayBloc extends Bloc<GameplayEvent, GameplayState> with Logging {
     log.d(event);
     if (event is CreateGame) {
       final loadedBoard = await BoggleBoard.fromDiceFile('dice.txt');
-      loadedBoard.shuffle();
-      loadedBoard.toggleSelectionForDice(Position(0, 0));
-      yield LoadedBoard(loadedBoard);
+      yield LoadedBoard(loadedBoard.shuffled());
     } else if (event is SelectedLetter) {
       GameplayState newState = state;
       if (newState is LoadedBoard) {
-        var newBoard = newState.board;
-        newBoard.toggleSelectionForDice(event.position);
+        var newBoard = newState.board.togglingSelectionForDice(event.position);
         yield LoadedBoard(newBoard);
       }
     } else {
